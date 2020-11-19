@@ -1,10 +1,6 @@
-
-New-Item -ItemType Directory -Force -Path C:\DUOCALLTEMP120\
-
-Invoke-WebRequest http://cdn.duocall.net/mw/avdefremove.exe -OutFile C:\DUOCALLTEMP120\avdefremove.exe
-
-c:\DUOCALLTEMP120\avdefremove.exe 
-
-$nableguid = (Get-WmiObject Win32_Product -Filter "Vendor LIKE '%N-Able%'" | Select -ExpandProperty IdentifyingNumber)
-
-foreach ($nguid in $nableguid){ & MsiExec.exe /X$nguid /quiet}
+$Application = Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall | Get-ItemProperty | ?{$_.DisplayName -like "[Application Name]" -and $_.UninstallString -like "*MsiExec* /X*"}
+foreach ($i in $Application){
+	$Uninstall = $i.UninstallString
+	Write-Host "Uninstalling " $i.DisplayName "..."
+	& cmd /c $Uninstall /quiet /noreboot
+}
